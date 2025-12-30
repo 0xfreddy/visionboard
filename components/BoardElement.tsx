@@ -1,0 +1,99 @@
+'use client';
+
+import { Rnd } from 'react-rnd';
+import { X } from 'lucide-react';
+import { useBoardStore } from '@/stores/boardStore';
+import { themes } from '@/lib/themes';
+import { BoardElement as BoardElementType } from '@/types';
+import ImageElement from './ImageElement';
+import GifElement from './GifElement';
+import TextElement from './TextElement';
+
+interface BoardElementProps {
+  element: BoardElementType;
+  isActive: boolean;
+}
+
+export default function BoardElement({ element, isActive }: BoardElementProps) {
+  const { updateElement, removeElement, bringToFront, theme } = useBoardStore();
+  const currentTheme = themes[theme];
+
+  const handleDragStop = (_e: unknown, d: { x: number; y: number }) => {
+    updateElement(element.id, { position: { x: d.x, y: d.y } });
+  };
+
+  const handleResizeStop = (
+    _e: unknown,
+    _direction: unknown,
+    ref: HTMLElement,
+    _delta: unknown,
+    position: { x: number; y: number }
+  ) => {
+    updateElement(element.id, {
+      size: { width: ref.offsetWidth, height: ref.offsetHeight },
+      position: { x: position.x, y: position.y },
+    });
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    bringToFront(element.id);
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    removeElement(element.id);
+  };
+
+  const renderContent = () => {
+    switch (element.type) {
+      case 'image':
+        return <ImageElement src={element.content} />;
+      case 'gif':
+        return <GifElement src={element.content} />;
+      case 'text':
+        return <TextElement content={element.content} fontFamily={currentTheme.fontFamily} textColor={currentTheme.textColor} />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <Rnd
+      default={{
+        x: element.position.x,
+        y: element.position.y,
+        width: element.size.width,
+        height: element.size.height,
+      }}
+      position={{ x: element.position.x, y: element.position.y }}
+      size={{ width: element.size.width, height: element.size.height }}
+      minWidth={50}
+      minHeight={50}
+      maxWidth={800}
+      maxHeight={800}
+      bounds="parent"
+      lockAspectRatio={element.type !== 'text'}
+      onDragStop={handleDragStop}
+      onResizeStop={handleResizeStop}
+      onClick={handleClick}
+      style={{ zIndex: element.zIndex }}
+      className={`group ${isActive ? 'ring-2 ring-blue-500 ring-offset-2' : ''}`}
+    >
+      <div className="relative w-full h-full">
+        {renderContent()}
+        
+        {/* Delete button */}
+        <button
+          onClick={handleDelete}
+          className={`absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-md transition-opacity ${
+            isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          }`}
+        >
+          <X size={14} />
+        </button>
+      </div>
+    </Rnd>
+  );
+}
+

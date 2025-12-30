@@ -1,0 +1,59 @@
+'use client';
+
+import { Image, Film, Type } from 'lucide-react';
+import { useBoardStore } from '@/stores/boardStore';
+import { ElementType } from '@/types';
+import DockToolButton from './DockToolButton';
+import InputBar from './InputBar';
+
+export default function Dock() {
+  const { selectedTool, setSelectedTool, isGenerating } = useBoardStore();
+
+  const handleToolSelect = (tool: ElementType) => {
+    if (selectedTool === tool) {
+      setSelectedTool(null);
+    } else {
+      setSelectedTool(tool);
+    }
+  };
+
+  return (
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-end gap-3 z-50">
+      {/* Input Bar - appears to the left when tool is selected */}
+      <InputBar />
+
+      {/* Tool Buttons */}
+      <div
+        className="flex items-center gap-2 p-3 rounded-2xl shadow-lg"
+        style={{
+          background: 'var(--dock-bg)',
+          backdropFilter: 'blur(10px)',
+          boxShadow: 'var(--dock-shadow)',
+        }}
+      >
+        <DockToolButton
+          icon={Image}
+          isSelected={selectedTool === 'image'}
+          isDisabled={isGenerating}
+          onClick={() => handleToolSelect('image')}
+          tooltip="Add AI Image"
+        />
+        <DockToolButton
+          icon={Film}
+          isSelected={selectedTool === 'gif'}
+          isDisabled={isGenerating}
+          onClick={() => handleToolSelect('gif')}
+          tooltip="Add GIF"
+        />
+        <DockToolButton
+          icon={Type}
+          isSelected={selectedTool === 'text'}
+          isDisabled={isGenerating}
+          onClick={() => handleToolSelect('text')}
+          tooltip="Add Text"
+        />
+      </div>
+    </div>
+  );
+}
+
