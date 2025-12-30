@@ -9,6 +9,7 @@ import GifSearchResults from './GifSearchResults';
 import ElementStyleToggle from './ElementStyleToggle';
 import StickerConfigurator from './StickerConfigurator';
 import PaperConfigurator from './PaperConfigurator';
+import DrawingToolbar from './DrawingToolbar';
 
 export default function InputBar() {
   const {
@@ -29,6 +30,16 @@ export default function InputBar() {
     setPaperConfig,
     shufflePaperStyle,
     resetPaperConfig,
+    // Drawing
+    drawing,
+    drawingTool,
+    setDrawingMode,
+    setActiveTool,
+    setDrawingColor,
+    setDrawingSize,
+    undoStroke,
+    redoStroke,
+    clearAllStrokes,
   } = useBoardStore();
 
   const [inputValue, setInputValue] = useState('');
@@ -211,6 +222,26 @@ export default function InputBar() {
   };
 
   if (!selectedTool) return null;
+
+  // Show DrawingToolbar when in draw mode
+  if (selectedTool === 'draw') {
+    return (
+      <DrawingToolbar
+        activeTool={drawingTool.activeTool}
+        activeColor={drawingTool.activeColor}
+        activeSize={drawingTool.activeSize}
+        onToolChange={setActiveTool}
+        onColorChange={setDrawingColor}
+        onSizeChange={setDrawingSize}
+        onUndo={undoStroke}
+        onRedo={redoStroke}
+        onClear={clearAllStrokes}
+        onDone={() => setDrawingMode(false)}
+        canUndo={drawing.undoStack.length > 0}
+        canRedo={drawing.redoStack.length > 0}
+      />
+    );
+  }
 
   const isTextMode = selectedTool === 'text';
   const placeholder =

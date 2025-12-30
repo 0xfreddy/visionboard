@@ -1,15 +1,15 @@
 'use client';
 
-import { Image, Film, Type } from 'lucide-react';
+import { Image, Film, Type, Pencil } from 'lucide-react';
 import { useBoardStore } from '@/stores/boardStore';
-import { ElementType } from '@/types';
+import { ToolType } from '@/types';
 import DockToolButton from './DockToolButton';
 import InputBar from './InputBar';
 
 export default function Dock() {
-  const { selectedTool, setSelectedTool, isGenerating } = useBoardStore();
+  const { selectedTool, setSelectedTool, isGenerating, drawingTool } = useBoardStore();
 
-  const handleToolSelect = (tool: ElementType) => {
+  const handleToolSelect = (tool: ToolType) => {
     if (selectedTool === tool) {
       setSelectedTool(null);
     } else {
@@ -34,23 +34,30 @@ export default function Dock() {
         <DockToolButton
           icon={Image}
           isSelected={selectedTool === 'image'}
-          isDisabled={isGenerating}
+          isDisabled={isGenerating || drawingTool.isDrawingMode}
           onClick={() => handleToolSelect('image')}
           tooltip="Add AI Image"
         />
         <DockToolButton
           icon={Film}
           isSelected={selectedTool === 'gif'}
-          isDisabled={isGenerating}
+          isDisabled={isGenerating || drawingTool.isDrawingMode}
           onClick={() => handleToolSelect('gif')}
           tooltip="Add GIF"
         />
         <DockToolButton
           icon={Type}
           isSelected={selectedTool === 'text'}
-          isDisabled={isGenerating}
+          isDisabled={isGenerating || drawingTool.isDrawingMode}
           onClick={() => handleToolSelect('text')}
           tooltip="Add Text"
+        />
+        <DockToolButton
+          icon={Pencil}
+          isSelected={selectedTool === 'draw'}
+          isDisabled={isGenerating}
+          onClick={() => handleToolSelect('draw')}
+          tooltip="Draw"
         />
       </div>
     </div>

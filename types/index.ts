@@ -1,6 +1,12 @@
+import { DrawingState, DrawingToolState, DrawingTool, DrawingPoint } from './drawing';
+
 export type ElementType = 'image' | 'gif' | 'text';
 
+export type ToolType = ElementType | 'draw';
+
 export type Theme = 'floral' | 'dubai' | 'simple';
+
+export type { DrawingState, DrawingToolState, DrawingTool, DrawingPoint };
 
 export type TextStyle = 'plain' | 'sticker';
 
@@ -75,7 +81,7 @@ export interface GifResult {
 export interface BoardState {
   elements: BoardElement[];
   theme: Theme;
-  selectedTool: ElementType | null;
+  selectedTool: ToolType | null;
   isGenerating: boolean;
   activeElementId: string | null;
   stickerConfig: StickerConfig;
@@ -83,12 +89,16 @@ export interface BoardState {
   paperConfig: PaperStyleConfig;
   elementStyle: ElementStyle;
 
+  // Drawing state
+  drawing: DrawingState;
+  drawingTool: DrawingToolState;
+
   addElement: (element: Omit<BoardElement, 'id' | 'zIndex' | 'createdAt'>) => boolean;
   updateElement: (id: string, updates: Partial<BoardElement>) => void;
   removeElement: (id: string) => void;
   bringToFront: (id: string) => void;
   setTheme: (theme: Theme) => void;
-  setSelectedTool: (tool: ElementType | null) => void;
+  setSelectedTool: (tool: ToolType | null) => void;
   setIsGenerating: (isGenerating: boolean) => void;
   setActiveElement: (id: string | null) => void;
   canAddElement: () => boolean;
@@ -100,5 +110,18 @@ export interface BoardState {
   shufflePaperStyle: () => void;
   resetPaperConfig: () => void;
   setElementStyle: (style: ElementStyle) => void;
+
+  // Drawing actions
+  setDrawingMode: (enabled: boolean) => void;
+  setActiveTool: (tool: DrawingTool) => void;
+  setDrawingColor: (color: string) => void;
+  setDrawingSize: (size: number) => void;
+  startStroke: (point: DrawingPoint) => void;
+  addPointToStroke: (point: DrawingPoint) => void;
+  finishStroke: () => void;
+  eraseStroke: (strokeId: string) => void;
+  undoStroke: () => void;
+  redoStroke: () => void;
+  clearAllStrokes: () => void;
 }
 
