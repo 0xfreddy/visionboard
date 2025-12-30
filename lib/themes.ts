@@ -5,7 +5,7 @@ export const themes: Record<Theme, ThemeConfig> = {
     name: 'floral',
     font: 'Instrument Serif',
     fontFamily: 'var(--font-instrument)',
-    background: '/backgrounds/floral.jpg',
+    background: '/backgrounds/floral.png',
     accentColor: '#d4a373',
     textColor: '#2d2d2d',
   },
