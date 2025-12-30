@@ -107,7 +107,7 @@ export default function InputBar() {
     if (!inputValue.trim() || !selectedTool) return;
 
     if (!canAddElement()) {
-      toast.error('Maximum 20 elements reached. Remove one to add more.');
+      toast.error('Maximum 50 elements reached. Remove one to add more.');
       return;
     }
 
@@ -184,7 +184,7 @@ export default function InputBar() {
 
   const handleGifSelect = (gif: GifResult) => {
     if (!canAddElement()) {
-      toast.error('Maximum 20 elements reached. Remove one to add more.');
+      toast.error('Maximum 50 elements reached. Remove one to add more.');
       return;
     }
 

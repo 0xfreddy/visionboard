@@ -44,7 +44,11 @@ export default function DrawingToolbar({
   const showColorPicker = activeTool !== 'eraser';
 
   return (
-    <div className="flex flex-col gap-3 p-4 rounded-2xl bg-white shadow-lg border border-gray-200 animate-slide-in">
+    <div 
+      className="flex flex-col gap-3 p-4 rounded-2xl bg-white shadow-lg border border-gray-200 animate-slide-in"
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
+    >
       {/* Tools Row */}
       <div className="flex gap-2">
         {TOOLS.map((tool) => (
@@ -79,7 +83,8 @@ export default function DrawingToolbar({
       <div className="flex items-center justify-between pt-2 border-t border-gray-200">
         <div className="flex gap-2">
           <button
-            onClick={onUndo}
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onUndo(); }}
             disabled={!canUndo}
             className="w-9 h-9 rounded-lg flex items-center justify-center bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
             title="Undo (Ctrl+Z)"
@@ -87,7 +92,8 @@ export default function DrawingToolbar({
             <Undo2 size={18} />
           </button>
           <button
-            onClick={onRedo}
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onRedo(); }}
             disabled={!canRedo}
             className="w-9 h-9 rounded-lg flex items-center justify-center bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
             title="Redo (Ctrl+Shift+Z)"
@@ -95,7 +101,8 @@ export default function DrawingToolbar({
             <Redo2 size={18} />
           </button>
           <button
-            onClick={onClear}
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onClear(); }}
             className="w-9 h-9 rounded-lg flex items-center justify-center bg-gray-100 text-red-600 hover:bg-red-50"
             title="Clear All"
           >
@@ -104,7 +111,8 @@ export default function DrawingToolbar({
         </div>
 
         <button
-          onClick={onDone}
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onDone(); }}
           className="px-4 h-9 rounded-lg flex items-center gap-1.5 bg-gray-900 text-white hover:bg-gray-800"
         >
           <Check size={16} />

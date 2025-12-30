@@ -22,8 +22,9 @@ export default function DrawingColorPicker({
 
         return (
           <button
+            type="button"
             key={preset.id}
-            onClick={() => onColorSelect(preset.color)}
+            onClick={(e) => { e.stopPropagation(); onColorSelect(preset.color); }}
             className={`w-6 h-6 rounded-full relative flex items-center justify-center transition-transform hover:scale-110 ${
               isSelected ? 'ring-2 ring-gray-900 ring-offset-1' : ''
             } ${isWhite ? 'border border-gray-300' : ''}`}

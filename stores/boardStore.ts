@@ -6,7 +6,7 @@ import { getDefaultStickerConfig } from '@/lib/blobGenerator';
 import { getDefaultPaperConfig } from '@/lib/paperPresets';
 import { TOOL_CONFIGS } from '@/lib/drawingTools';
 
-const MAX_ELEMENTS = 20;
+const MAX_ELEMENTS = 50;
 const MAX_UNDO_STEPS = 50;
 
 const initialDrawingState = {

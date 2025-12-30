@@ -26,9 +26,16 @@ export default function ToolButton({
 }: ToolButtonProps) {
   const Icon = TOOL_ICONS[tool];
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onClick();
+  };
+
   return (
     <button
-      onClick={onClick}
+      type="button"
+      onClick={handleClick}
       disabled={disabled}
       className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
         isActive
