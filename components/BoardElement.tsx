@@ -9,6 +9,7 @@ import ImageElement from './ImageElement';
 import GifElement from './GifElement';
 import TextElement from './TextElement';
 import StickerElement from './StickerElement';
+import PaperStyledElement from './PaperStyledElement';
 
 interface BoardElementProps {
   element: BoardElementType;
@@ -47,19 +48,35 @@ export default function BoardElement({ element, isActive }: BoardElementProps) {
   };
 
   const renderContent = () => {
+    let content: React.ReactNode = null;
+
     switch (element.type) {
       case 'image':
-        return <ImageElement src={element.content} />;
+        content = <ImageElement src={element.content} />;
+        break;
       case 'gif':
-        return <GifElement src={element.content} />;
+        content = <GifElement src={element.content} />;
+        break;
       case 'text':
-        if (element.textStyle === 'sticker' && element.stickerConfig) {
+        if (element.elementStyle === 'sticker' || (element.textStyle === 'sticker' && element.stickerConfig)) {
           return <StickerElement element={element} />;
         }
-        return <TextElement content={element.content} fontFamily={currentTheme.fontFamily} textColor={currentTheme.textColor} />;
+        content = <TextElement content={element.content} fontFamily={currentTheme.fontFamily} textColor={currentTheme.textColor} />;
+        break;
       default:
         return null;
     }
+
+    // Wrap with paper style if configured
+    if (element.elementStyle === 'paper' && element.paperConfig) {
+      return (
+        <PaperStyledElement element={element}>
+          {content}
+        </PaperStyledElement>
+      );
+    }
+
+    return content;
   };
 
   return (
@@ -72,12 +89,12 @@ export default function BoardElement({ element, isActive }: BoardElementProps) {
       }}
       position={{ x: element.position.x, y: element.position.y }}
       size={{ width: element.size.width, height: element.size.height }}
-      minWidth={element.type === 'text' && element.textStyle === 'sticker' ? 80 : 50}
-      minHeight={element.type === 'text' && element.textStyle === 'sticker' ? 80 : 50}
-      maxWidth={element.type === 'text' && element.textStyle === 'sticker' ? 400 : 800}
-      maxHeight={element.type === 'text' && element.textStyle === 'sticker' ? 400 : 800}
+      minWidth={element.elementStyle === 'sticker' ? 80 : 50}
+      minHeight={element.elementStyle === 'sticker' ? 80 : 50}
+      maxWidth={element.elementStyle === 'sticker' ? 400 : 800}
+      maxHeight={element.elementStyle === 'sticker' ? 400 : 800}
       bounds="parent"
-      lockAspectRatio={element.type !== 'text' || element.textStyle === 'sticker'}
+      lockAspectRatio={element.type !== 'text' || element.elementStyle === 'sticker'}
       onDragStop={handleDragStop}
       onResizeStop={handleResizeStop}
       onClick={handleClick}

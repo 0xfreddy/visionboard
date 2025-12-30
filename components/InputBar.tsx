@@ -4,10 +4,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { Send, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useBoardStore } from '@/stores/boardStore';
-import { GifResult } from '@/types';
+import { GifResult, ElementStyle } from '@/types';
 import GifSearchResults from './GifSearchResults';
-import TextStyleToggle from './TextStyleToggle';
+import ElementStyleToggle from './ElementStyleToggle';
 import StickerConfigurator from './StickerConfigurator';
+import PaperConfigurator from './PaperConfigurator';
 
 export default function InputBar() {
   const {
@@ -22,6 +23,12 @@ export default function InputBar() {
     setStickerConfig,
     shuffleStickerShape,
     resetStickerConfig,
+    elementStyle,
+    setElementStyle,
+    paperConfig,
+    setPaperConfig,
+    shufflePaperStyle,
+    resetPaperConfig,
   } = useBoardStore();
 
   const [inputValue, setInputValue] = useState('');
@@ -63,6 +70,28 @@ export default function InputBar() {
     };
   }, []);
 
+  // Get effective element style for text (maps textStyle to elementStyle)
+  const getEffectiveStyle = (): ElementStyle => {
+    if (selectedTool === 'text') {
+      if (textStyle === 'sticker') return 'sticker';
+      if (textStyle === 'plain') return 'none';
+    }
+    return elementStyle;
+  };
+
+  // Handle style change for text (backward compatible)
+  const handleTextStyleChange = (style: ElementStyle) => {
+    if (style === 'sticker') {
+      setTextStyle('sticker');
+    } else if (style === 'paper') {
+      setTextStyle('plain');
+      setElementStyle('paper');
+    } else {
+      setTextStyle('plain');
+      setElementStyle('none');
+    }
+  };
+
   const handleSubmit = async () => {
     if (!inputValue.trim() || !selectedTool) return;
 
@@ -82,13 +111,22 @@ export default function InputBar() {
         const data = await res.json();
 
         if (data.success && data.imageUrl) {
-          addElement({
+          const elementData: any = {
             type: 'image',
             content: data.imageUrl,
             position: getRandomPosition(),
             size: { width: 256, height: 256 },
-          });
+          };
+
+          if (elementStyle === 'paper') {
+            elementData.elementStyle = 'paper';
+            elementData.paperConfig = { ...paperConfig };
+          }
+
+          addElement(elementData);
           setInputValue('');
+          resetPaperConfig();
+          setElementStyle('none');
           toast.success('Image generated!');
         } else {
           toast.error(data.error || 'Failed to generate image');
@@ -99,6 +137,7 @@ export default function InputBar() {
         setIsGenerating(false);
       }
     } else if (selectedTool === 'text') {
+      const effectiveStyle = getEffectiveStyle();
       const elementData: any = {
         type: 'text',
         content: inputValue,
@@ -107,17 +146,28 @@ export default function InputBar() {
       };
 
       if (textStyle === 'sticker') {
+        elementData.elementStyle = 'sticker';
         elementData.size = { width: 200, height: 200 };
         elementData.stickerConfig = { ...stickerConfig };
+      } else if (elementStyle === 'paper') {
+        elementData.elementStyle = 'paper';
+        elementData.size = { width: 300, height: 200 };
+        elementData.paperConfig = { ...paperConfig };
       } else {
+        elementData.elementStyle = 'none';
         elementData.size = { width: 300, height: 150 };
       }
 
       addElement(elementData);
       setInputValue('');
       resetStickerConfig();
+      resetPaperConfig();
       setTextStyle('plain');
-      toast.success(textStyle === 'sticker' ? 'Sticker added!' : 'Text added!');
+      setElementStyle('none');
+      
+      const message = textStyle === 'sticker' ? 'Sticker added!' : 
+                      elementStyle === 'paper' ? 'Paper text added!' : 'Text added!';
+      toast.success(message);
     }
   };
 
@@ -127,15 +177,24 @@ export default function InputBar() {
       return;
     }
 
-    addElement({
+    const elementData: any = {
       type: 'gif',
       content: gif.url,
       position: getRandomPosition(),
       size: { width: Math.min(gif.width, 300), height: Math.min(gif.height, 300) },
-    });
+    };
+
+    if (elementStyle === 'paper') {
+      elementData.elementStyle = 'paper';
+      elementData.paperConfig = { ...paperConfig };
+    }
+
+    addElement(elementData);
     setInputValue('');
     setGifResults([]);
-    toast.success('GIF added!');
+    resetPaperConfig();
+    setElementStyle('none');
+    toast.success(elementStyle === 'paper' ? 'Paper GIF added!' : 'GIF added!');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -161,6 +220,10 @@ export default function InputBar() {
       ? 'Search for a GIF...'
       : 'Enter your text...';
 
+  // Determine which configurator to show
+  const showStickerConfig = isTextMode && textStyle === 'sticker';
+  const showPaperConfig = elementStyle === 'paper' && !showStickerConfig;
+
   return (
     <div className="relative animate-slide-in">
       {/* GIF Results */}
@@ -178,11 +241,19 @@ export default function InputBar() {
         className="flex flex-col gap-2 p-3 rounded-2xl bg-white shadow-lg border border-gray-200"
         style={{ width: '320px' }}
       >
-        {/* Style Toggle (only for text mode) */}
-        {isTextMode && (
-          <TextStyleToggle
-            value={textStyle}
-            onChange={setTextStyle}
+        {/* Style Toggle */}
+        {isTextMode ? (
+          <ElementStyleToggle
+            elementType="text"
+            selectedStyle={textStyle === 'sticker' ? 'sticker' : elementStyle === 'paper' ? 'paper' : 'none'}
+            onStyleChange={handleTextStyleChange}
+            disabled={isGenerating}
+          />
+        ) : (
+          <ElementStyleToggle
+            elementType={selectedTool}
+            selectedStyle={elementStyle}
+            onStyleChange={setElementStyle}
             disabled={isGenerating}
           />
         )}
@@ -235,8 +306,8 @@ export default function InputBar() {
           </div>
         </div>
 
-        {/* Sticker Configurator (only when sticker mode is selected) */}
-        {isTextMode && textStyle === 'sticker' && (
+        {/* Sticker Configurator */}
+        {showStickerConfig && (
           <StickerConfigurator
             text={inputValue}
             config={stickerConfig}
@@ -244,8 +315,16 @@ export default function InputBar() {
             onShuffle={shuffleStickerShape}
           />
         )}
+
+        {/* Paper Configurator */}
+        {elementStyle === 'paper' && !showStickerConfig && (
+          <PaperConfigurator
+            config={paperConfig}
+            onConfigChange={setPaperConfig}
+            onShuffle={shufflePaperStyle}
+          />
+        )}
       </div>
     </div>
   );
 }
-

@@ -4,6 +4,17 @@ export type Theme = 'floral' | 'dubai' | 'simple';
 
 export type TextStyle = 'plain' | 'sticker';
 
+export type PaperVariant = 'torn' | 'notebook' | 'kraft' | 'sticky';
+
+export type ElementStyle = 'none' | 'sticker' | 'paper';
+
+export interface PaperStyleConfig {
+  variant: PaperVariant;
+  seed: number;
+  tintColor: string;
+  rotation: number;
+}
+
 export interface Position {
   x: number;
   y: number;
@@ -40,6 +51,8 @@ export interface BoardElement {
   createdAt: number;
   textStyle?: TextStyle;
   stickerConfig?: StickerConfig;
+  elementStyle?: ElementStyle;
+  paperConfig?: PaperStyleConfig;
 }
 
 export interface ThemeConfig {
@@ -67,6 +80,8 @@ export interface BoardState {
   activeElementId: string | null;
   stickerConfig: StickerConfig;
   textStyle: TextStyle;
+  paperConfig: PaperStyleConfig;
+  elementStyle: ElementStyle;
 
   addElement: (element: Omit<BoardElement, 'id' | 'zIndex' | 'createdAt'>) => boolean;
   updateElement: (id: string, updates: Partial<BoardElement>) => void;
@@ -81,5 +96,9 @@ export interface BoardState {
   shuffleStickerShape: () => void;
   resetStickerConfig: () => void;
   setTextStyle: (style: TextStyle) => void;
+  setPaperConfig: (config: Partial<PaperStyleConfig>) => void;
+  shufflePaperStyle: () => void;
+  resetPaperConfig: () => void;
+  setElementStyle: (style: ElementStyle) => void;
 }
 

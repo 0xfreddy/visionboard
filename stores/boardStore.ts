@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
-import { BoardState, BoardElement, StickerConfig } from '@/types';
+import { BoardState, BoardElement } from '@/types';
 import { getDefaultStickerConfig } from '@/lib/blobGenerator';
+import { getDefaultPaperConfig } from '@/lib/paperPresets';
 
 const MAX_ELEMENTS = 20;
 
@@ -13,6 +14,8 @@ export const useBoardStore = create<BoardState>((set, get) => ({
   activeElementId: null,
   stickerConfig: getDefaultStickerConfig(),
   textStyle: 'plain',
+  paperConfig: getDefaultPaperConfig(),
+  elementStyle: 'none',
 
   addElement: (elementData) => {
     const state = get();
@@ -77,5 +80,19 @@ export const useBoardStore = create<BoardState>((set, get) => ({
     set({ stickerConfig: getDefaultStickerConfig() });
   },
   setTextStyle: (style) => set({ textStyle: style }),
+  setPaperConfig: (config) => {
+    set((state) => ({
+      paperConfig: { ...state.paperConfig, ...config },
+    }));
+  },
+  shufflePaperStyle: () => {
+    set((state) => ({
+      paperConfig: { ...state.paperConfig, seed: Math.random() },
+    }));
+  },
+  resetPaperConfig: () => {
+    set({ paperConfig: getDefaultPaperConfig() });
+  },
+  setElementStyle: (style) => set({ elementStyle: style }),
 }));
 
