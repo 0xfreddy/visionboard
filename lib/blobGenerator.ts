@@ -1,4 +1,4 @@
-import * as blobs2 from 'blobs/v2';
+import { svgPath } from 'blobs/v2';
 import { STICKER_PALETTES, DEFAULT_PALETTE_INDEX } from './stickerPalettes';
 
 export interface BlobConfig {
@@ -15,7 +15,7 @@ export const DEFAULT_BLOB_CONFIG = {
 };
 
 export function generateBlobPath(config: BlobConfig): string {
-  return blobs2.svgPath({
+  return svgPath({
     seed: config.seed,
     extraPoints: config.extraPoints ?? DEFAULT_BLOB_CONFIG.extraPoints,
     randomness: config.randomness ?? DEFAULT_BLOB_CONFIG.randomness,
