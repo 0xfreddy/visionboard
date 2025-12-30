@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
-import { BoardState, BoardElement } from '@/types';
+import { BoardState, BoardElement, StickerConfig } from '@/types';
+import { getDefaultStickerConfig } from '@/lib/blobGenerator';
 
 const MAX_ELEMENTS = 20;
 
@@ -10,6 +11,8 @@ export const useBoardStore = create<BoardState>((set, get) => ({
   selectedTool: null,
   isGenerating: false,
   activeElementId: null,
+  stickerConfig: getDefaultStickerConfig(),
+  textStyle: 'plain',
 
   addElement: (elementData) => {
     const state = get();
@@ -60,5 +63,19 @@ export const useBoardStore = create<BoardState>((set, get) => ({
   setIsGenerating: (isGenerating) => set({ isGenerating }),
   setActiveElement: (id) => set({ activeElementId: id }),
   canAddElement: () => get().elements.length < MAX_ELEMENTS,
+  setStickerConfig: (config) => {
+    set((state) => ({
+      stickerConfig: { ...state.stickerConfig, ...config },
+    }));
+  },
+  shuffleStickerShape: () => {
+    set((state) => ({
+      stickerConfig: { ...state.stickerConfig, seed: Math.random() },
+    }));
+  },
+  resetStickerConfig: () => {
+    set({ stickerConfig: getDefaultStickerConfig() });
+  },
+  setTextStyle: (style) => set({ textStyle: style }),
 }));
 

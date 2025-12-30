@@ -6,6 +6,8 @@ import toast from 'react-hot-toast';
 import { useBoardStore } from '@/stores/boardStore';
 import { GifResult } from '@/types';
 import GifSearchResults from './GifSearchResults';
+import TextStyleToggle from './TextStyleToggle';
+import StickerConfigurator from './StickerConfigurator';
 
 export default function InputBar() {
   const {
@@ -14,6 +16,12 @@ export default function InputBar() {
     setIsGenerating,
     addElement,
     canAddElement,
+    textStyle,
+    setTextStyle,
+    stickerConfig,
+    setStickerConfig,
+    shuffleStickerShape,
+    resetStickerConfig,
   } = useBoardStore();
 
   const [inputValue, setInputValue] = useState('');
@@ -91,14 +99,25 @@ export default function InputBar() {
         setIsGenerating(false);
       }
     } else if (selectedTool === 'text') {
-      addElement({
+      const elementData: any = {
         type: 'text',
         content: inputValue,
         position: getRandomPosition(),
-        size: { width: 300, height: 150 },
-      });
+        textStyle,
+      };
+
+      if (textStyle === 'sticker') {
+        elementData.size = { width: 200, height: 200 };
+        elementData.stickerConfig = { ...stickerConfig };
+      } else {
+        elementData.size = { width: 300, height: 150 };
+      }
+
+      addElement(elementData);
       setInputValue('');
-      toast.success('Text added!');
+      resetStickerConfig();
+      setTextStyle('plain');
+      toast.success(textStyle === 'sticker' ? 'Sticker added!' : 'Text added!');
     }
   };
 
@@ -156,54 +175,75 @@ export default function InputBar() {
 
       {/* Input Container */}
       <div
-        className="flex items-end gap-2 p-3 rounded-2xl bg-white shadow-lg border border-gray-200"
+        className="flex flex-col gap-2 p-3 rounded-2xl bg-white shadow-lg border border-gray-200"
         style={{ width: '320px' }}
       >
-        {isTextMode ? (
-          <textarea
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={placeholder}
+        {/* Style Toggle (only for text mode) */}
+        {isTextMode && (
+          <TextStyleToggle
+            value={textStyle}
+            onChange={setTextStyle}
             disabled={isGenerating}
-            maxLength={1000}
-            className="flex-1 resize-none border-none outline-none text-gray-900 placeholder-gray-400 bg-transparent"
-            style={{ minHeight: '40px', maxHeight: '200px' }}
-            rows={3}
-          />
-        ) : (
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={placeholder}
-            disabled={isGenerating}
-            maxLength={500}
-            className="flex-1 border-none outline-none text-gray-900 placeholder-gray-400 bg-transparent h-10"
           />
         )}
 
-        <div className="flex items-center gap-1">
-          {inputValue && (
-            <button
-              onClick={() => setInputValue('')}
-              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
-            >
-              <X size={18} />
-            </button>
+        <div className="flex items-end gap-2">
+          {isTextMode ? (
+            <textarea
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={placeholder}
+              disabled={isGenerating}
+              maxLength={1000}
+              className="flex-1 resize-none border-none outline-none text-gray-900 placeholder-gray-400 bg-transparent"
+              style={{ minHeight: '40px', maxHeight: '200px' }}
+              rows={3}
+            />
+          ) : (
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={placeholder}
+              disabled={isGenerating}
+              maxLength={500}
+              className="flex-1 border-none outline-none text-gray-900 placeholder-gray-400 bg-transparent h-10"
+            />
           )}
-          
-          {(selectedTool !== 'gif' || !inputValue) && inputValue && (
-            <button
-              onClick={handleSubmit}
-              disabled={isGenerating || !inputValue.trim()}
-              className="w-8 h-8 flex items-center justify-center bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Send size={16} />
-            </button>
-          )}
+
+          <div className="flex items-center gap-1">
+            {inputValue && (
+              <button
+                onClick={() => setInputValue('')}
+                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+              >
+                <X size={18} />
+              </button>
+            )}
+            
+            {(selectedTool !== 'gif' || !inputValue) && inputValue && (
+              <button
+                onClick={handleSubmit}
+                disabled={isGenerating || !inputValue.trim()}
+                className="w-8 h-8 flex items-center justify-center bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Send size={16} />
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* Sticker Configurator (only when sticker mode is selected) */}
+        {isTextMode && textStyle === 'sticker' && (
+          <StickerConfigurator
+            text={inputValue}
+            config={stickerConfig}
+            onConfigChange={setStickerConfig}
+            onShuffle={shuffleStickerShape}
+          />
+        )}
       </div>
     </div>
   );

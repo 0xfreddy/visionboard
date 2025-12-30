@@ -2,6 +2,8 @@ export type ElementType = 'image' | 'gif' | 'text';
 
 export type Theme = 'floral' | 'dubai' | 'simple';
 
+export type TextStyle = 'plain' | 'sticker';
+
 export interface Position {
   x: number;
   y: number;
@@ -12,6 +14,22 @@ export interface Size {
   height: number;
 }
 
+export interface StickerConfig {
+  seed: number;
+  fillColor: string;
+  borderColor: string;
+  textColor: string;
+  paletteIndex: number;
+}
+
+export interface ColorPalette {
+  id: string;
+  fill: string;
+  border: string;
+  text: string;
+  name: string;
+}
+
 export interface BoardElement {
   id: string;
   type: ElementType;
@@ -20,6 +38,8 @@ export interface BoardElement {
   size: Size;
   zIndex: number;
   createdAt: number;
+  textStyle?: TextStyle;
+  stickerConfig?: StickerConfig;
 }
 
 export interface ThemeConfig {
@@ -45,6 +65,8 @@ export interface BoardState {
   selectedTool: ElementType | null;
   isGenerating: boolean;
   activeElementId: string | null;
+  stickerConfig: StickerConfig;
+  textStyle: TextStyle;
 
   addElement: (element: Omit<BoardElement, 'id' | 'zIndex' | 'createdAt'>) => boolean;
   updateElement: (id: string, updates: Partial<BoardElement>) => void;
@@ -55,5 +77,9 @@ export interface BoardState {
   setIsGenerating: (isGenerating: boolean) => void;
   setActiveElement: (id: string | null) => void;
   canAddElement: () => boolean;
+  setStickerConfig: (config: Partial<StickerConfig>) => void;
+  shuffleStickerShape: () => void;
+  resetStickerConfig: () => void;
+  setTextStyle: (style: TextStyle) => void;
 }
 

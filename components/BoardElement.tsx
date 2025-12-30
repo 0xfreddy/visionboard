@@ -8,6 +8,7 @@ import { BoardElement as BoardElementType } from '@/types';
 import ImageElement from './ImageElement';
 import GifElement from './GifElement';
 import TextElement from './TextElement';
+import StickerElement from './StickerElement';
 
 interface BoardElementProps {
   element: BoardElementType;
@@ -52,6 +53,9 @@ export default function BoardElement({ element, isActive }: BoardElementProps) {
       case 'gif':
         return <GifElement src={element.content} />;
       case 'text':
+        if (element.textStyle === 'sticker' && element.stickerConfig) {
+          return <StickerElement element={element} />;
+        }
         return <TextElement content={element.content} fontFamily={currentTheme.fontFamily} textColor={currentTheme.textColor} />;
       default:
         return null;
@@ -68,12 +72,12 @@ export default function BoardElement({ element, isActive }: BoardElementProps) {
       }}
       position={{ x: element.position.x, y: element.position.y }}
       size={{ width: element.size.width, height: element.size.height }}
-      minWidth={50}
-      minHeight={50}
-      maxWidth={800}
-      maxHeight={800}
+      minWidth={element.type === 'text' && element.textStyle === 'sticker' ? 80 : 50}
+      minHeight={element.type === 'text' && element.textStyle === 'sticker' ? 80 : 50}
+      maxWidth={element.type === 'text' && element.textStyle === 'sticker' ? 400 : 800}
+      maxHeight={element.type === 'text' && element.textStyle === 'sticker' ? 400 : 800}
       bounds="parent"
-      lockAspectRatio={element.type !== 'text'}
+      lockAspectRatio={element.type !== 'text' || element.textStyle === 'sticker'}
       onDragStop={handleDragStop}
       onResizeStop={handleResizeStop}
       onClick={handleClick}
