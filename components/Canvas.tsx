@@ -70,6 +70,7 @@ export default function Canvas() {
 
       {/* Board elements - dimmed when in drawing mode */}
       <div
+        className="absolute inset-0 w-full h-full"
         style={{
           opacity: drawingTool.isDrawingMode ? 0.7 : 1,
           pointerEvents: drawingTool.isDrawingMode ? 'none' : 'auto',

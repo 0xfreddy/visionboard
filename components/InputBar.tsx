@@ -175,10 +175,6 @@ export default function InputBar() {
       resetPaperConfig();
       setTextStyle('plain');
       setElementStyle('none');
-      
-      const message = textStyle === 'sticker' ? 'Sticker added!' : 
-                      elementStyle === 'paper' ? 'Paper text added!' : 'Text added!';
-      toast.success(message);
     }
   };
 
