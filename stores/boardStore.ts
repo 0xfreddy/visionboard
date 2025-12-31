@@ -25,7 +25,7 @@ const initialDrawingToolState = {
 
 export const useBoardStore = create<BoardState>((set, get) => ({
   elements: [],
-  theme: 'simple',
+  theme: 'floral',
   selectedTool: null,
   isGenerating: false,
   activeElementId: null,
