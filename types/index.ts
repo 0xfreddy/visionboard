@@ -2,7 +2,7 @@ import { DrawingState, DrawingToolState, DrawingTool, DrawingPoint } from './dra
 
 export type ElementType = 'image' | 'gif' | 'text';
 
-export type ToolType = ElementType | 'draw';
+export type ToolType = ElementType | 'draw' | 'sticker';
 
 export type Theme = 'floral' | 'dubai' | 'simple';
 

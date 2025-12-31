@@ -1,6 +1,6 @@
 'use client';
 
-import { Image, Film, Type, Pencil } from 'lucide-react';
+import { Image, Film, Type, Pencil, Sticker } from 'lucide-react';
 import { useBoardStore } from '@/stores/boardStore';
 import { ToolType } from '@/types';
 import DockToolButton from './DockToolButton';
@@ -58,6 +58,13 @@ export default function Dock() {
           isDisabled={isGenerating}
           onClick={() => handleToolSelect('draw')}
           tooltip="Draw"
+        />
+        <DockToolButton
+          icon={Sticker}
+          isSelected={selectedTool === 'sticker'}
+          isDisabled={isGenerating || drawingTool.isDrawingMode}
+          onClick={() => handleToolSelect('sticker')}
+          tooltip="Add Sticker"
         />
       </div>
     </div>

@@ -10,6 +10,7 @@ import ElementStyleToggle from './ElementStyleToggle';
 import StickerConfigurator from './StickerConfigurator';
 import PaperConfigurator from './PaperConfigurator';
 import DrawingToolbar from './DrawingToolbar';
+import StickerPicker from './StickerPicker';
 
 export default function InputBar() {
   const {
@@ -218,6 +219,11 @@ export default function InputBar() {
   };
 
   if (!selectedTool) return null;
+
+  // Show StickerPicker when sticker tool is selected
+  if (selectedTool === 'sticker') {
+    return <StickerPicker />;
+  }
 
   // Show DrawingToolbar when in draw mode
   if (selectedTool === 'draw') {
